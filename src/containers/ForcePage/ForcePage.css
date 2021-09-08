@@ -1,0 +1,195 @@
+.ForcePage {
+  background: #182216;
+  height:100vh;
+  width: 100%;
+}
+.ForcePage .force-btn-group {
+  background: #fff;
+  /* padding: 16px; */
+  position: absolute;
+  /* left: 45vw;
+  * *top: 40px; */
+  /* box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1); */
+  border-radius: 6px;
+  z-index: 5;
+  margin: 0;
+  padding: 0;
+  height: 0;
+}
+.ForcePage .force-btn-group button {
+  background: white;
+  border-radius: 6px;
+}
+.ForcePage .chevron {
+  background: white;
+  cursor: pointer;
+  height: 40px;
+  border-radius: 6px;
+  align-items: center;
+  display: flex;
+}
+.ForcePage .date-swither {
+  position: absolute;
+  top: 63px;
+  right: 16px;
+}
+.ForcePage .date-btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 88px;
+}
+.ForcePage .date-swither span {
+  font-size: 14px;
+  display: inline-block;
+  cursor: pointer;
+  padding: 8px 4px;
+  line-height: 24px;
+  border-radius: 6px;
+  min-width: 88px;
+  background: #fff;
+}
+.ForcePage .user-data-table {
+  position: absolute;
+  top: 40px;
+  right: 0px;
+  width: 100%;
+}
+.ForcePage .form-date-label {
+  cursor: unset;
+  pointer-events: none;
+}
+.ForcePage #forceSvg {
+  padding-top: 140px;
+}
+
+.active-btn {
+  background: #000000 !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+}
+
+.connect-swither {
+  left: 45vw;
+  top: 63px;
+}
+
+.period-container {
+  left: 65vw;
+  top: 40px;
+  display: flex;
+}
+
+.date-btn-container {
+  background: #fff;
+  flex-wrap: nowrap;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.form_radio_group {
+  display: inline-block;
+  overflow: hidden;
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  background: #F2F2F2;
+  border-radius: 6px;
+  /* padding: 0px 8px; */
+  /* identical to box height, or 171% */
+  text-align: center;
+  text-transform: capitalize;
+  min-width: 88px;
+}
+
+.form_radio_group-item {
+  /* display: inline-block; */
+  float: left;
+}
+.form_radio_group-item label:hover {
+  background: #333333 !important;
+  color: #fff !important;
+}
+
+.form_radio_group input[type=radio] {
+  display: none;
+}
+.form_radio_group label {
+  /* height: 40px;
+  * *display: flex;
+  * *justify-content:center;
+  * *text-align: center; */
+  font-size: 14px;
+  display: inline-block;
+  cursor: pointer;
+  padding: 8px 4px;
+  line-height: 24px;
+  /* border: 1px solid #999; */
+  border-right: none;
+  user-select: none;
+  background: #FFFFFF;
+  border-radius: 6px;
+  min-width: 88px;
+}
+.form_radio_group .form_radio_group-item:first-child label {
+  border-radius: 6px 0 0 6px;
+}
+.form_radio_group .form_radio_group-item:last-child label {
+  border-radius: 0 6px 6px 0;
+  border-right: 1px solid transparent;
+}
+.form_radio_group input[type=radio]:checked + label {
+  background: #000;
+  color: #fff;
+}
+.form_radio_group label:hover {
+  color: #666;
+}
+.form_radio_group input[type=radio]:disabled + label {
+  background: #efefef;
+  color: #666;
+}
+
+.dark .ForcePage .d3-chart-wrapper, .dark .ForcePage .force-btn-group, .dark .ForcePage svg {
+  background: #131313;
+}
+.dark .ForcePage .date-swither span {
+  background: #222222;
+  color: #f2f2f2;
+}
+.dark .ForcePage .form_radio_group-item, .dark .ForcePage .form_radio_group {
+  background: #222222;
+}
+.dark .ForcePage .form_radio_group-item label:hover {
+  background: #333333 !important;
+  color: #BDBDBD !important;
+}
+.dark .ForcePage .active-btn {
+  background: #BDBDBD !important;
+  color: #F2F2F2 !important;
+}
+.dark .ForcePage label {
+  background: #222222;
+  color: #bdbdbd;
+}
+.dark .ForcePage input[type=radio]:checked + label {
+  background: #5D5D5D;
+  color: #f2f2f2;
+}
+.dark .ForcePage label:hover {
+  color: #f2f2f2;
+}
+.dark .ForcePage input[type=radio]:disabled + label {
+  background: #686868;
+  color: #f2f2f2;
+}
+.dark .ForcePage .customTable .table, .dark .ForcePage .customTable .ui.table thead th {
+  background: #222222 !important;
+  color: #bdbdbd;
+}
