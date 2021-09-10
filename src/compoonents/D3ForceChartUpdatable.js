@@ -19,8 +19,40 @@ class D3ForceChart extends Component {
     //   { id: 1, reflexive: true, value: 80 },
     //   { id: 2, reflexive: false, value: 40 }
     // ];
-    this.lastNodeId = 2;
-    this.dataset = {
+    // this.lastNodeId = 2;
+    // this
+
+  }
+
+  componentDidMount() {
+    // console.log("D3 FORRCE CHART componentDidUpdate ", this.props);
+    // this.chart(this.props.nodes, this.props.links, this.props.relationSelected);
+    this.chart();
+    window.addEventListener('resize', this.onResize, false);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize, false);
+  }
+
+  componentDidUpdate() {
+    // // this.init();
+    // // this.updateData(this.props.data);
+    // console.log("componentDidUpdmate", this.props);
+    this.chart();
+  }
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   // // console.log("ForcePage, shouldComponentUpdate", !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links && nextProps.relationSelected === this.props.relationSelected))
+  //   // return !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links);
+  // }
+
+  onResize = () => {
+    this.chart();
+  }
+
+  chart() {
+     let dataset = {
       nodes: [
         { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category: 2 },
         { id: 2, name: 'ASMT', label: 'Assessment Repository', group: 'Team A', value: 60, category: 1 },
@@ -66,40 +98,14 @@ class D3ForceChart extends Component {
         { source: 4, target: 2 },
         { source: 5, target: 3 }
       ]
-    }
-      ;
+    };
 
-  }
-
-  componentDidMount() {
-    // console.log("D3 FORRCE CHART componentDidUpdate ", this.props);
-    // this.chart(this.props.nodes, this.props.links, this.props.relationSelected);
-    this.chart(this.dataset, this.lastNodeId);
-    window.addEventListener('resize', this.onResize, false);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.onResize, false);
-  }
-
-  componentDidUpdate() {
-    // // this.init();
-    // // this.updateData(this.props.data);
-    // console.log("componentDidUpdmate", this.props);
-    this.chart(this.dataset, this.lastNodeId);
-  }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   // // console.log("ForcePage, shouldComponentUpdate", !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links && nextProps.relationSelected === this.props.relationSelected))
-  //   // return !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links);
-  // }
-
-  onResize = () => {
-    this.chart(this.dataset, this.lastNodeId);
-  }
-
-  chart(dataset, lastNodeId) {
-
+    let nodesById = dataset.nodes.reduce((acc,el) => {
+      acc[el.id] = el;
+      return acc;
+    }, {});
+    console.log("nodesById", nodesById);
+    // let groupedBySource = d3.nest().key(d=>d.source).entries(dataset.links);
 
     const element = this.viz || document.querySelector('body');
     d3.select(element).selectAll("*").remove();
@@ -159,7 +165,7 @@ class D3ForceChart extends Component {
       .on('tick', ticked);
 
 
-
+    let markerSize = 6;
     svg.append('defs')
       .append('marker')
       .attr("id", 'arrowhead')
@@ -167,8 +173,8 @@ class D3ForceChart extends Component {
       .attr('refX', 0) // x coordinate for the reference point of the marker. If circle is bigger, this need to be bigger.
       .attr('refY', 0)
       .attr('orient', 'auto')
-      .attr('markerWidth', 6)
-      .attr('markerHeight', 6)
+      .attr('markerWidth', markerSize)
+      .attr('markerHeight', markerSize)
       .attr('xoverflow', 'visible')
       .append('path')
       .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
@@ -194,12 +200,13 @@ class D3ForceChart extends Component {
     let selectedNode = null;
     let selectedLink = null;
     let mousedownLink = null;
-    let mousedownNode = null;
-    let mouseupNode = null;
+    let sourceNode = null;
+    let targetNode = null;
+    let defaultNodeWeight = 40;
 
     function resetMouseVars() {
-      mousedownNode = null;
-      mouseupNode = null;
+      sourceNode = null;
+      targetNode = null;
       mousedownLink = null;
     }
 
@@ -207,16 +214,35 @@ class D3ForceChart extends Component {
     function ticked() {
 
       path
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
+        .each(d => {
+          // Total difference in x and y from source to target
+          d.target.x = d.target.x || 0;
+          d.target.y = d.target.y || 0;
+          d.source.x = d.source.x || 0;
+          d.source.y = d.source.y || 0;
+          d.diffX = d.target.x - d.source.x;
+          d.diffY = d.target.y - d.source.y;
+          d.target.radius = (lineWidthScale(d.target.value) + markerSize * 2) || 0;
 
-      node.attr('transform', (d) => `translate(${d && d.x ? d.x : d3.mouse[0]},${d && d.y ? d.y : d3.mouse[1]})`);
+          // Length of path from center of source node to center of target node
+          d.pathLength = Math.sqrt((d.diffX * d.diffX) + (d.diffY * d.diffY));
+
+          // x and y distances from center to outside edge of target node
+          d.offsetX = ((d.diffX * d.target.radius) / d.pathLength) || 0;
+          d.offsetY = ((d.diffY * d.target.radius) / d.pathLength) || 0;
+        })
+        .attr("x1", d => d.source.x || 0)
+        .attr("y1", d => d.source.y || 0)
+        .attr("x2", d => (d.target.x - d.offsetX) || 0)
+        .attr("y2", d => (d.target.y - d.offsetY) || 0);
+        // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
+
+      node.attr('transform', (d) => `translate(${d && d.x ? d.x : 0},${d && d.y ? d.y : 0})`);
     }
 
     // update graph (called when needed)
     function restart() {
+      console.log("dataset",dataset);
       // path (link) group
       path = path.data(dataset.links);
 
@@ -229,7 +255,7 @@ class D3ForceChart extends Component {
         .attr('class', 'link')
         .classed('selected', (d) => d === selectedLink)
         // .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
-        // .style('marker-end', 'url(#arrowhead)')
+        .style('marker-end', 'url(#arrowhead)')
         .on('mousedown', (d) => {
           if (d3.event.ctrlKey) return;
 
@@ -247,7 +273,12 @@ class D3ForceChart extends Component {
 
       // update existing nodes (reflexive & selected visual states)
       node.selectAll('circle')
-        .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))
+        .attr('r', d => lineWidthScale(d.value))// 17)// d => lineWidthScale(d.value))
+        .style("fill", d => colors(d.group));
+        
+        node.selectAll(".value")
+        .text(d => d.value);
+        // .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))
         // .classed('reflexive', (d) => d.reflexive)
         ;
 
@@ -256,6 +287,24 @@ class D3ForceChart extends Component {
 
       // add new nodes
       const circle = node.enter().append('g');
+
+      function recursive(sourceNodeWeight, _node) {
+        // console.log("recursive", nodesById[_node.id]);
+        dataset.links.forEach( link => {
+          if(_node.id === link.source.id){
+            // dataset.nodes.forEach(node => {
+            //   if(node.id === link.source.id){
+            //     node.value = sourceNodeWeight + node.value;
+            //     recursive(sourceNodeWeight, node);
+            //   } 
+            // });
+            let node = nodesById[link.target.id];
+            // console.log("node", node);
+            node.value = node.value + sourceNodeWeight;
+            recursive(sourceNodeWeight, node);
+          } 
+        });
+      }
 
       circle.append('circle')
         .attr('class', 'node')
@@ -268,12 +317,12 @@ class D3ForceChart extends Component {
         .style("stroke-width", d => d.value / 10)//lineWidthScale(d.value))//d.value/10)
         // .classed('reflexive', (d) => d.reflexive)
         // .on('mouseover', function (d) {
-        //   if (!mousedownNode || d === mousedownNode) return;
+        //   if (!sourceNode || d === sourceNode) return;
         //   // enlarge target node
         //   d3.select(this).attr('transform', 'scale(1.1)');
         // })
         .on('mouseout', function (d) {
-          if (!mousedownNode || d === mousedownNode) return;
+          if (!sourceNode || d === sourceNode) return;
           // unenlarge target node
           d3.select(this).attr('transform', '');
         })
@@ -281,48 +330,50 @@ class D3ForceChart extends Component {
           if (d3.event.ctrlKey) return;
 
           // select node
-          mousedownNode = d;
-          selectedNode = (mousedownNode === selectedNode) ? null : mousedownNode;
+          sourceNode = d;
+          selectedNode = (sourceNode === selectedNode) ? null : sourceNode;
           selectedLink = null;
 
           // reposition drag line
           dragLine
             .style('marker-end', 'url(#arrowhead)')
             .classed('hidden', false)
-            .attr("x1", mousedownNode.x)
-            .attr("y1", mousedownNode.y)
-            .attr("x2", mousedownNode.x)
-            .attr("y2", mousedownNode.y);
-          // .attr('d', `M${mousedownNode.x},${mousedownNode.y}L${mousedownNode.x},${mousedownNode.y}`);
+            .attr("x1", sourceNode.x)
+            .attr("y1", sourceNode.y)
+            .attr("x2", sourceNode.x)
+            .attr("y2", sourceNode.y);
+          // .attr('d', `M${sourceNode.x},${sourceNode.y}L${sourceNode.x},${sourceNode.y}`);
 
           restart();
         })
         .on('mouseup', function (d) {
-          if (!mousedownNode) return;
-          console.log("d",d,"mousedownNode",mousedownNode);
+          if (!sourceNode) return;
+          console.log("d",d,"sourceNode",sourceNode);
           // needed by FF
           dragLine
             .classed('hidden', true)
             .style('marker-end', '');
           
           // check for drag-to-self
-          mouseupNode = d;
+          targetNode = d;
 
-          // if(mouseupNode !== mousedownNode){
-          //   mouseupNode.value = mousedownNode.value + mouseupNode.value;
-          //   dataset.nodes.map(d => {
-          //     if(d.id === mouseupNode.id){
-          //       return d.value = mousedownNode.value
-          //     }
-          //   })
+          // if(targetNode !== sourceNode){
+          //   targetNode.value = sourceNode.value + targetNode.value;
+          //   console.log("targetNode.value",targetNode.value,"sourceNode.value ",sourceNode.value );
+          // //   dataset.nodes.map(d => {
+          // //     if(d.id === targetNode.id){
+          // //       return d.value = sourceNode.value
+          // //     }
+          // //   })
           // } 
 
-          dataset.nodes.map(d=>{
-            if(d.id === mouseupNode.id){
-              return d.value = mousedownNode.value + d.value
-            } 
-            });
-          if (mouseupNode === mousedownNode) {
+          // dataset.nodes.forEach( d=> {
+          //   if(d.id === targetNode.id){
+
+          //     let increasedValue = sourceNode.value + d.value;
+              
+
+          if (targetNode === sourceNode) {
             resetMouseVars();
             return;
           }
@@ -330,38 +381,76 @@ class D3ForceChart extends Component {
           // unenlarge target node
           d3.select(this).attr('transform', '');
 
-          // add link to graph (update if exists)
-          // NB: links are strictly source < target; arrows separately specified by booleans
-          const isRight = mousedownNode.id < mouseupNode.id;
-          const source = isRight ? mousedownNode : mouseupNode;
-          const target = isRight ? mouseupNode : mousedownNode;
+          const directLink = dataset.links.filter((l) => l.source.id === sourceNode.id && l.target.id === targetNode.id);
+          const reverseLink = dataset.links.filter((l) => l.source.id === targetNode.id && l.target.id === sourceNode.id);
+          const alreadyConnected = dataset.links.filter((l) => l.source.id === sourceNode.id);
 
-          const link = dataset.links.filter((l) => l.source === source && l.target === target)[0];
-          if (link) {
-            // link[isRight ? 'right' : 'left'] = true;
-          } else {
+          if(directLink.length){
+            // no events
+          }else if(reverseLink.length){
+            let sourceNodeWeight = sourceNode.value;
+            sourceNode.value = targetNode.value;
+            targetNode.value = sourceNodeWeight;
+            // dataset.links = dataset.links.filter((l) => !(l.source.id === targetNode.id && l.target.id === sourceNode.id)); // remove inversed link to current link
+            reverseLink[0].source = sourceNode;
+            reverseLink[0].target = targetNode;
+            // dataset.links.push({
+            //   source: sourceNode, target: targetNode, //left: !isRight, right: isRight
+            // });
+          }else if(alreadyConnected.length){
             dataset.links.push({
-              source, target, //left: !isRight, right: isRight
+              source: sourceNode, target: targetNode, //left: !isRight, right: isRight
             });
+            targetNode.value = sourceNode.value + targetNode.value;
+            // no value recalculation
+          }else if (directLink.length === 0) {
+            dataset.links.push({
+              source: sourceNode, target: targetNode, //left: !isRight, right: isRight
+            });
+            recursive(sourceNode.value, sourceNode);
           }
 
+            // dataset.links.forEach( link => {
+            //   if(sourceNode.id === link.target){
+                
+            //     dataset.nodes.forEach(node => {
+            //       if(node.id === link.source){
+            //         node.value = sourceNode.value + node.value;
+            //       } 
+            //     });
+            //     //     // return d.value = sourceNode.value + d.value
+            //     //   } 
+            //     //   });
+            //     //     return d.value = increasedValue
+            //   } 
+            // });
+
+          // groupedBySource = d3.nest().key(d=>d.source).entries(dataset.links);
+
           // select new link
-          selectedLink = link;
-          selectedNode = null;
+          // selectedLink = link;
+          // selectedNode = null;
           restart();
         });
 
 
       circle.append("text")
+        .attr("class","name")
         .attr("dy", 0)
         .attr("dx", 0)
         .text(d => d.name);
       circle.append("text")
+      .attr("class","value")
         .attr("dy", 12)
         .attr("dx", 0)
         .text(d => d.value);
 
       node = circle.merge(node);
+
+      //
+
+      //
+
 
       // set the graph in motion
       force
@@ -396,33 +485,35 @@ class D3ForceChart extends Component {
       // because :active only works in WebKit?
       svg.classed('active', true);
 
-      if (d3.event.ctrlKey || mousedownNode || mousedownLink) return;
+      if (d3.event.ctrlKey || sourceNode || mousedownLink) return;
 
       // insert new node at point
       const point = d3.mouse(this);
       console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
-      const node = { id: ++lastNodeId, x: point[0], y: point[1], value: 40, name: 'new node', label: 'new node', category: 2, group: 'Team C', };//reflexive: false,
+      const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true};//reflexive: false,
       dataset.nodes.push(node);
+      nodesById[node.id] = node;
 
       restart();
     }
 
     function mousemove() {
-      if (!mousedownNode) return;
+      if (!sourceNode) return;
 
       // update drag line
       dragLine
-        // .style('marker-end', 'url(#arrowhead)')
-        .attr("x1", mousedownNode.x)
-        .attr("y1", mousedownNode.y)
+        .style('marker-end', 'url(#arrowhead)')
+        .attr("x1", sourceNode.x)
+        .attr("y1", sourceNode.y)
         .attr("x2", d3.mouse(this)[0])
         .attr("y2", d3.mouse(this)[1]);
-      // .attr('d', `M${mousedownNode.x},${mousedownNode.y}L${d3.mouse(this)[0]},${d3.mouse(this)[1]}`);
+        
+      // .attr('d', `M${sourceNode.x},${sourceNode.y}L${d3.mouse(this)[0]},${d3.mouse(this)[1]}`);
     }
 
     function mouseup() {
-      if (mousedownNode) {
+      if (sourceNode) {
         // hide drag line
         dragLine
           .classed('hidden', true)
