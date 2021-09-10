@@ -2,7 +2,8 @@ import React, { Component } from "react";
 // import { Link } from "react-router-dom";
 import "./ForcePage.css";
 // import * as d3 from 'd3';
-import D3ForceChart from "../../compoonents/D3forceChart";
+// import D3ForceChart from "../../compoonents/D3forceChart";
+import D3ForceChartUpdatable from "../../compoonents/D3ForceChartUpdatable";
 import DataJson from '../../data/data_v1.json';
 
 
@@ -87,8 +88,8 @@ export default class ForcePage extends Component {
       };
     };
     nodes.sort((a, b) => b.messageAmount.value - a.messageAmount.value);
-    console.log("links", links);
-    console.log("nodes", nodes);
+    // console.log("links", links);
+    // console.log("nodes", nodes);
 
     this.setState({ nodes: JSON.parse(JSON.stringify(nodes)), links: JSON.parse(JSON.stringify(links)) })
     //     })
@@ -101,20 +102,26 @@ export default class ForcePage extends Component {
   }
 
   render() {
-    console.log("this.state.nodes", this.state.nodes, "this.state.links", this.state.links);
+    // console.log("this.state.nodes", this.state.nodes, "this.state.links", this.state.links);
 
     return (
       <div className="ForcePage">
         <div className="force-wrapper">
-          {!!(this.state.nodes && this.state.links) && (
+          {/* {!!(this.state.nodes && this.state.links) && (
             <D3ForceChart
               nodes={this.state.nodes}
               links={this.state.links}
               relationSelected={'value'}
             />
-          )}
+          )} */}
+          <div>
+          <p>Click in the open space to <strong>add a node</strong>, drag from one node to another to <strong>add an edge</strong>.<br/>
+          Ctrl-drag a node to <strong>move</strong> the graph layout.<br/>
+          Click a node to <strong>select</strong> it.</p>
+          </div>
+          <D3ForceChartUpdatable/>
+          </div>
         </div>
-      </div>
-    );
+        );
   }
 }
