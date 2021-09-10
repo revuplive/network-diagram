@@ -59,12 +59,12 @@ class D3ForceChart extends Component {
         { id: 3, name: 'CALC', label: 'Final Calc', group: 'Team C', value: 30, category: 3 },
         { id: 4, name: 'DEMO', label: 'Demographic', group: 'Team B', value: 40, category: 1 },
         { id: 5, name: 'ELIG', label: 'Eligibility', group: 'Team B', value: 20, category: 2 },
-        { id: 6, name: 'GOAL', label: 'Goal Setting', group: 'Team C', value: 60, category: 2 },
+        { id: 6, name: 'GOAL', label: 'Goal Setting', group: 'Team C', value: 60, category: 3 },
         { id: 7, name: 'GROW', label: 'Growth Model', group: 'Team C', value: 60, category: 2 },
-        { id: 8, name: 'LINK', label: 'Linkage', group: 'Team A', value: 100, category: 1 },
+        { id: 8, name: 'LINK', label: 'Linkage', group: 'Team A', value: 100, category: 4 },
         { id: 9, name: 'MOSL', label: 'MOSL', group: 'Team A', value: 80, category: 2 },
         { id: 10, name: 'MOTP', label: 'MOTP', group: 'Team A', value: 20, category: 1 },
-        { id: 11, name: 'REPT', label: 'Reporting', group: 'Team E', value: 240, category: 4 },
+        { id: 11, name: 'REPT', label: 'Reporting', group: 'Team D', value: 240, category: 4 },
         { id: 12, name: 'SEDD', label: 'State Data', group: 'Team A', value: 30, category: 1 },
         { id: 13, name: 'SNAP', label: 'Snapshot', group: 'Team A', value: 40, category: 0 }
       ], links: [
@@ -116,7 +116,7 @@ class D3ForceChart extends Component {
     // const colors = d3.scaleOrdinal(d3.schemeCategory10);
     const colors = d3.scaleOrdinal() //=d3.scaleOrdinal(d3.schemeSet2)
       .domain(["Team A", "Team B", "Team C", "Team D", "Team E"])
-      .range(['#ff9e6d', '#86cbff', '#c2e5a0', '#fff686', '#9e79db']);
+      .range(['#ff9e6d', '#86cbff', '#c2e5a0', '#9e79db', '#fff686']);
 
     let valueExtent = d3.extent(dataset.nodes, (dataset.nodes, d => d.value));
     const lineWidthScale = d3.scaleLinear()
@@ -491,7 +491,7 @@ class D3ForceChart extends Component {
       const point = d3.mouse(this);
       console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
-      const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true};//reflexive: false,
+      const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 5, group: 'Team E', new: true};//reflexive: false,
       dataset.nodes.push(node);
       nodesById[node.id] = node;
 
