@@ -305,8 +305,8 @@ class D3ForceChart extends Component {
         //also going to add a centering force
         //and a link force
         var link_force = d3.forceLink(links_data)
-        .id(d => d.id)
-        .distance((d) => nodeDistanceScale(d.values["value"]) || radius);//.strength();relationSelected
+            .id(d => d.id)
+            .distance((d) => nodeDistanceScale(d.values["value"]) || radius);//.strength();relationSelected
 
         const forceX = d3.forceX(width / 2).strength(0.025);
         const forceY = d3.forceY(height / 2).strength(0.025);
@@ -323,7 +323,7 @@ class D3ForceChart extends Component {
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force("charge", d3.forceManyBody().strength(-1000)) //.strength(1) //charge_force
             // .force("center", d3.forceCenter(width / 2, height / 2)) //width / 2, height / 2 //center_force
-            .force("attraceForce",d3.forceManyBody().strength(-100)) //.force("attraceForce",d3.forceManyBody().strength(0));
+            .force("attraceForce", d3.forceManyBody().strength(-100)) //.force("attraceForce",d3.forceManyBody().strength(0));
             // .force('x', forceX)
             // .force('y', forceY)
             // .force("links", link_force);
