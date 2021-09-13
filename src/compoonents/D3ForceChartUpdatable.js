@@ -5,24 +5,24 @@ import * as d3 from 'd3';
 import './D3ForceChartUpdatable.css';
 
 class D3ForceChart extends Component {
-  constructor(props) {
-    super(props);
-    // this.state = {
-    //   };
-    // this.positions = {};
-    // set up initial nodes and links
-    //  - nodes are known by 'id', not by index in array.
-    //  - reflexive edges are indicated on the node (as a bold black circle).
-    //  - links are always source < target; edge directions are set by 'left' and 'right'.
-    // [
-    //   { id: 0, reflexive: false, value: 40,name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2},
-    //   { id: 1, reflexive: true, value: 80 },
-    //   { id: 2, reflexive: false, value: 40 }
-    // ];
-    // this.lastNodeId = 2;
-    // this
+  // constructor(props) {
+  //   super(props);
+  //   // this.state = {
+  //   //   };
+  //   // this.positions = {};
+  //   // set up initial nodes and links
+  //   //  - nodes are known by 'id', not by index in array.
+  //   //  - reflexive edges are indicated on the node (as a bold black circle).
+  //   //  - links are always source < target; edge directions are set by 'left' and 'right'.
+  //   // [
+  //   //   { id: 0, reflexive: false, value: 40,name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2},
+  //   //   { id: 1, reflexive: true, value: 80 },
+  //   //   { id: 2, reflexive: false, value: 40 }
+  //   // ];
+  //   // this.lastNodeId = 2;
+  //   // this
 
-  }
+  // }
 
   componentDidMount() {
     // console.log("D3 FORRCE CHART componentDidUpdate ", this.props);
@@ -52,7 +52,7 @@ class D3ForceChart extends Component {
   }
 
   chart() {
-     let dataset = {
+    let dataset = {
       nodes: [
         { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category: 2 },
         { id: 2, name: 'ASMT', label: 'Assessment Repository', group: 'Team A', value: 60, category: 1 },
@@ -100,7 +100,7 @@ class D3ForceChart extends Component {
       ]
     };
 
-    let nodesById = dataset.nodes.reduce((acc,el) => {
+    let nodesById = dataset.nodes.reduce((acc, el) => {
       acc[el.id] = el;
       return acc;
     }, {});
@@ -109,7 +109,7 @@ class D3ForceChart extends Component {
 
     const element = this.viz || document.querySelector('body');
     d3.select(element).selectAll("*").remove();
-    const margin = { top: 0, right: 5, bottom: 0, left: 5 };
+    const margin = { top: 0, right: 25, bottom: 0, left: 25 };
     // set up SVG for D3
     const width = element.offsetWidth - (margin.left + margin.right) * 2;
     const height = 700;
@@ -146,7 +146,7 @@ class D3ForceChart extends Component {
       .on('end', dragend)
       ;
     // init D3 force layout
-    const force = d3.forceSimulation()
+    const forceSimulation = d3.forceSimulation()
       .force("link", d3.forceLink()
         .id(d => d.id)
         .distance(150)
@@ -235,14 +235,14 @@ class D3ForceChart extends Component {
         .attr("y1", d => d.source.y || 0)
         .attr("x2", d => (d.target.x - d.offsetX) || 0)
         .attr("y2", d => (d.target.y - d.offsetY) || 0);
-        // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
+      // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
 
       node.attr('transform', (d) => `translate(${d && d.x ? d.x : 0},${d && d.y ? d.y : 0})`);
     }
 
     // update graph (called when needed)
     function restart() {
-      console.log("dataset",dataset);
+      console.log("dataset", dataset);
       // path (link) group
       path = path.data(dataset.links);
 
@@ -275,12 +275,12 @@ class D3ForceChart extends Component {
       node.selectAll('circle')
         .attr('r', d => lineWidthScale(d.value))// 17)// d => lineWidthScale(d.value))
         .style("fill", d => colors(d.group));
-        
-        node.selectAll(".value")
+
+      node.selectAll(".value")
         .text(d => d.value);
-        // .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))
-        // .classed('reflexive', (d) => d.reflexive)
-        ;
+      // .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))
+      // .classed('reflexive', (d) => d.reflexive)
+      ;
 
       // remove old nodes
       node.exit().remove();
@@ -290,8 +290,8 @@ class D3ForceChart extends Component {
 
       function recursive(sourceNodeWeight, _node) {
         // console.log("recursive", nodesById[_node.id]);
-        dataset.links.forEach( link => {
-          if(_node.id === link.source.id){
+        dataset.links.forEach(link => {
+          if (_node.id === link.source.id) {
             // dataset.nodes.forEach(node => {
             //   if(node.id === link.source.id){
             //     node.value = sourceNodeWeight + node.value;
@@ -302,12 +302,13 @@ class D3ForceChart extends Component {
             // console.log("node", node);
             node.value = node.value + sourceNodeWeight;
             recursive(sourceNodeWeight, node);
-          } 
+          }
         });
       }
 
       circle.append('circle')
         .attr('class', 'node')
+        .attr("id",d=> "circle"+d.id)
         .attr('r', d => lineWidthScale(d.value))// 17)// d => lineWidthScale(d.value))
         // .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))\
 
@@ -348,12 +349,12 @@ class D3ForceChart extends Component {
         })
         .on('mouseup', function (d) {
           if (!sourceNode) return;
-          console.log("d",d,"sourceNode",sourceNode);
+          console.log("d", d, "sourceNode", sourceNode);
           // needed by FF
           dragLine
             .classed('hidden', true)
             .style('marker-end', '');
-          
+
           // check for drag-to-self
           targetNode = d;
 
@@ -371,7 +372,7 @@ class D3ForceChart extends Component {
           //   if(d.id === targetNode.id){
 
           //     let increasedValue = sourceNode.value + d.value;
-              
+
 
           if (targetNode === sourceNode) {
             resetMouseVars();
@@ -385,9 +386,9 @@ class D3ForceChart extends Component {
           const reverseLink = dataset.links.filter((l) => l.source.id === targetNode.id && l.target.id === sourceNode.id);
           const alreadyConnected = dataset.links.filter((l) => l.source.id === sourceNode.id);
 
-          if(directLink.length){
+          if (directLink.length) {
             // no events
-          }else if(reverseLink.length){
+          } else if (reverseLink.length) {
             let sourceNodeWeight = sourceNode.value;
             sourceNode.value = targetNode.value;
             targetNode.value = sourceNodeWeight;
@@ -397,33 +398,33 @@ class D3ForceChart extends Component {
             // dataset.links.push({
             //   source: sourceNode, target: targetNode, //left: !isRight, right: isRight
             // });
-          }else if(alreadyConnected.length){
+          } else if (alreadyConnected.length) {
             dataset.links.push({
               source: sourceNode, target: targetNode, //left: !isRight, right: isRight
             });
             targetNode.value = sourceNode.value + targetNode.value;
             // no value recalculation
-          }else if (directLink.length === 0) {
+          } else if (directLink.length === 0) {
             dataset.links.push({
               source: sourceNode, target: targetNode, //left: !isRight, right: isRight
             });
             recursive(sourceNode.value, sourceNode);
           }
 
-            // dataset.links.forEach( link => {
-            //   if(sourceNode.id === link.target){
-                
-            //     dataset.nodes.forEach(node => {
-            //       if(node.id === link.source){
-            //         node.value = sourceNode.value + node.value;
-            //       } 
-            //     });
-            //     //     // return d.value = sourceNode.value + d.value
-            //     //   } 
-            //     //   });
-            //     //     return d.value = increasedValue
-            //   } 
-            // });
+          // dataset.links.forEach( link => {
+          //   if(sourceNode.id === link.target){
+
+          //     dataset.nodes.forEach(node => {
+          //       if(node.id === link.source){
+          //         node.value = sourceNode.value + node.value;
+          //       } 
+          //     });
+          //     //     // return d.value = sourceNode.value + d.value
+          //     //   } 
+          //     //   });
+          //     //     return d.value = increasedValue
+          //   } 
+          // });
 
           // groupedBySource = d3.nest().key(d=>d.source).entries(dataset.links);
 
@@ -435,12 +436,12 @@ class D3ForceChart extends Component {
 
 
       circle.append("text")
-        .attr("class","name")
+        .attr("class", "name")
         .attr("dy", 0)
         .attr("dx", 0)
         .text(d => d.name);
       circle.append("text")
-      .attr("class","value")
+        .attr("class", "value")
         .attr("dy", 12)
         .attr("dx", 0)
         .text(d => d.value);
@@ -449,15 +450,62 @@ class D3ForceChart extends Component {
 
       //
 
+      //set up dictionary of neighbors
+      var neighborTarget = {};
+      console.log("dataset.nodes",dataset.nodes);
+      for (let i = 0; i < dataset.nodes.length; i++) {
+        let id = dataset.nodes[i].id;
+        neighborTarget[id] = dataset.links.filter((d) => d.source === id).map((d) => d.target)
+      };
+      var neighborSource = {};
+      for (let i = 0; i < dataset.nodes.length; i++) {
+        let id = dataset.nodes[i].id;
+        neighborSource[id] = dataset.links.filter((d) => d.target === id).map((d) => d.source)
+      };
+
+      console.log("neighborSource is ", neighborSource);
+      console.log("neighborTarget is ", neighborTarget);
+
+      circle.selectAll("circle").on("click", (d) => {
+        // console.log("d",d);
+        var active = d.active ? false : true // toggle whether node is active
+          , newStroke = active ? "yellow" : "grey"
+          , newStrokeIn = active ? "green" : "grey"
+          , newStrokeOut = active ? "red" : "grey"
+          , newOpacity = active ? 0.6 : 0.3
+          , subgraphOpacity = active ? 0.9 : 0;
+
+          console.log("CIRCLE CLICK, ",d, " active ",active);
+        //extract node's id and ids of its neighbors
+        var id = d.id
+          , neighborS = neighborSource[id]
+          , neighborT = neighborTarget[id];
+        console.log("neighbors is from ", neighborS, " to ", neighborT);
+        d3.selectAll("#circle" + id).style("stroke-opacity", newOpacity);
+        d3.selectAll("#circle" + id).style("stroke", newStroke);
+
+        d3.selectAll("#subgraph").style("opacity", subgraphOpacity)
+
+        //highlight the current node and its neighbors
+        for (let i = 0; i < neighborS.length; i++) {
+          d3.selectAll("#line" + neighborS[i] + id).style("stroke", newStrokeIn);
+          d3.selectAll("#circle" + neighborS[i]).style("stroke-opacity", newOpacity).style("stroke", newStrokeIn);
+        }
+        for (let i = 0; i < neighborT.length; i++) {
+          d3.selectAll("#line" + id + neighborT[i]).style("stroke", newStrokeOut);
+          d3.selectAll("#circle" + neighborT[i]).style("stroke-opacity", newOpacity).style("stroke", newStrokeOut);
+        }
+        //update whether or not the node is active
+        d.active = active;
+      })
       //
 
-
       // set the graph in motion
-      force
+      forceSimulation
         .nodes(dataset.nodes)
         .force('link').links(dataset.links);
 
-      force.alphaTarget(0.3).restart();
+      forceSimulation.alphaTarget(0.3).restart();
     }
 
     // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
@@ -465,7 +513,7 @@ class D3ForceChart extends Component {
     //When the drag gesture starts, the targeted node is fixed to the pointer
     //The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
     function dragstarted(d) {
-      if (!d3.event.active) force.alphaTarget(0.3).restart();//sets the current target alpha to the specified number in the range [0,1].
+      if (!d3.event.active) forceSimulation.alphaTarget(0.3).restart();//sets the current target alpha to the specified number in the range [0,1].
       d.fy = d.y; //fx - the node’s fixed x-position. Original is null.
       d.fx = d.x; //fy - the node’s fixed y-position. Original is null.
     }
@@ -477,13 +525,13 @@ class D3ForceChart extends Component {
     }
 
     function dragend(d) {
-      if (!d3.event.active) force.alphaTarget(0);
+      if (!d3.event.active) forceSimulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
     }
     function mousedown() {
       // because :active only works in WebKit?
-      svg.classed('active', true);
+      // svg.classed('active', true);
 
       if (d3.event.ctrlKey || sourceNode || mousedownLink) return;
 
@@ -491,7 +539,7 @@ class D3ForceChart extends Component {
       const point = d3.mouse(this);
       console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
-      const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 5, group: 'Team E', new: true};//reflexive: false,
+      const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true };//reflexive: false,
       dataset.nodes.push(node);
       nodesById[node.id] = node;
 
@@ -508,7 +556,7 @@ class D3ForceChart extends Component {
         .attr("y1", sourceNode.y)
         .attr("x2", d3.mouse(this)[0])
         .attr("y2", d3.mouse(this)[1]);
-        
+
       // .attr('d', `M${sourceNode.x},${sourceNode.y}L${d3.mouse(this)[0]},${d3.mouse(this)[1]}`);
     }
 
@@ -521,7 +569,7 @@ class D3ForceChart extends Component {
       }
 
       // because :active only works in WebKit?
-      svg.classed('active', false);
+      // svg.classed('active', false);
 
       // clear mouse event vars
       resetMouseVars();
@@ -565,34 +613,6 @@ class D3ForceChart extends Component {
           selectedNode = null;
           restart();
           break;
-        // case 66: // B
-        // if (selectedLink) {
-        //   // set link direction to both left and right
-        //   // selectedLink.left = true;
-        //   // selectedLink.right = true;
-        // }
-        //   restart();
-        //   break;
-        // case 76: // L
-        // if (selectedLink) {
-        //   // set link direction to left only
-        //   selectedLink.left = true;
-        //   selectedLink.right = false;
-        // }
-        //   restart();
-        //   break;
-        // case 82: // R
-        // if (selectedNode) {
-        //   // toggle node reflexivity
-        //   // selectedNode.reflexive = !selectedNode.reflexive;
-        // }
-        // else if (selectedLink) {
-        //   // set link direction to right only
-        //   selectedLink.left = false;
-        //   selectedLink.right = true;
-        // }
-        // restart();
-        // break;
         default:
           break;
       }
@@ -616,8 +636,6 @@ class D3ForceChart extends Component {
     //   return ctx.measureText(text).width;
     // } // getTextWidth(d, '12px', 'myriad-pro-condensed, robotoCondensed-light, sans-serif');
 
-
-
     // app starts here
     svg.on('mousedown', mousedown)
       .on('mousemove', mousemove)
@@ -628,7 +646,6 @@ class D3ForceChart extends Component {
     restart();
   }
 
-
   render() {
     return (
       <div className="d3-chart-wrapper " id='forceSvg' ref={viz => (this.viz = viz)}>
@@ -636,7 +653,5 @@ class D3ForceChart extends Component {
     );
   }
 }
-
-
 
 export default D3ForceChart;
