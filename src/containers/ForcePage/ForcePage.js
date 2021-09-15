@@ -4,7 +4,8 @@ import React, { Component } from "react";
 import "./ForcePage.css";
 // import * as d3 from 'd3';
 // import D3ForceChart from "../../compoonents/D3forceChart";
-import D3ForceChartUpdatable from "../../compoonents/D3ForceChartUpdatable";
+// import D3ForceChartUpdatable from "../../compoonents/D3ForceChartUpdatable";
+import D3ForceChartBouncing from "../../compoonents/D3ForceChartBouncing";
 // import DataJson from '../../data/data_v1.json';
 
 
@@ -115,12 +116,13 @@ export default class ForcePage extends Component {
               relationSelected={'value'}
             />
           )} */}
-          <div>
+          {/* <div>
           <p>Click in the open space to <strong>add a node</strong>, drag from one node to another to <strong>add an edge</strong>.<br/>
           Ctrl-drag a node to <strong>move</strong> the graph layout.<br/>
           Click a node to <strong>select</strong> it.</p>
-          </div>
-          <D3ForceChartUpdatable/>
+          </div> */}
+          {/* <D3ForceChartUpdatable/> */}
+          <D3ForceChartBouncing/>
           </div>
         </div>
         );
