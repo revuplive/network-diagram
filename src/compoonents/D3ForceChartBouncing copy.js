@@ -5,54 +5,25 @@ import * as d3 from 'd3';
 import './D3ForceChartUpdatable.css';
 
 class D3ForceChart extends Component {
-  // constructor(props) {
-  //   super(props);
-  //   // this.state = {
-  //   //   };
-  //   // this.positions = {};
-  //   // set up initial nodes and links
-  //   //  - nodes are known by 'id', not by index in array.
-  //   //  - reflexive edges are indicated on the node (as a bold black circle).
-  //   //  - links are always source < target; edge directions are set by 'left' and 'right'.
-  //   // [
-  //   //   { id: 0, reflexive: false, value: 40,name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2},
-  //   //   { id: 1, reflexive: true, value: 80 },
-  //   //   { id: 2, reflexive: false, value: 40 }
-  //   // ];
-  //   // this.lastNodeId = 2;
-  //   // this
-
-  // }
-
-  componentDidMount() {
-    // console.log("D3 FORRCE CHART componentDidUpdate ", this.props);
-    // this.chart(this.props.nodes, this.props.links, this.props.relationSelected);
-    this.chart();
-    window.addEventListener('resize', this.onResize, false);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.onResize, false);
-  }
-
-  componentDidUpdate() {
-    // // this.init();
-    // // this.updateData(this.props.data);
-    // console.log("componentDidUpdmate", this.props);
-    this.chart();
-  }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   // // console.log("ForcePage, shouldComponentUpdate", !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links && nextProps.relationSelected === this.props.relationSelected))
-  //   // return !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links);
-  // }
-
-  onResize = () => {
-    this.chart();
-  }
-
-  chart() {
-    let dataset = {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: 'Team A'
+    };
+    this.handleChange = this.handleChange.bind(this);
+    // this.positions = {};
+    // set up initial nodes and links
+    //  - nodes are known by 'id', not by index in array.
+    //  - reflexive edges are indicated on the node (as a bold black circle).
+    //  - links are always source < target; edge directions are set by 'left' and 'right'.
+    // [
+    //   { id: 0, reflexive: false, value: 40,name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2},
+    //   { id: 1, reflexive: true, value: 80 },
+    //   { id: 2, reflexive: false, value: 40 }
+    // ];
+    // this.lastNodeId = 2;
+    // this
+    this.dataset = {
       nodes: [
         { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category: 2 },
         { id: 2, name: 'ASMT', label: 'Assessment Repository', group: 'Team A', value: 60, category: 1 },
@@ -98,19 +69,56 @@ class D3ForceChart extends Component {
         { source: 5, target: 3 }
       ]
     };
+    this.nodesByGroups = d3.nest().key(d => d.group).entries(this.dataset.nodes);
+    // console.log("nodesByGroups", this.nodesByGroups);
+
+  }
+
+  componentDidMount() {
+    // console.log("D3 FORRCE CHART componentDidUpdate ", this.props);
+    // this.chart(this.props.nodes, this.props.links, this.props.relationSelected);
+    this.chart(this.dataset);
+    // this.table(this.dataset);
+    window.addEventListener('resize', this.onResize, false);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize, false);
+  }
+
+  componentDidUpdate() {
+    // // this.init();
+    // // this.updateData(this.props.data);
+    // console.log("componentDidUpdmate", this.props);
+    this.chart(this.dataset);
+    // this.table(this.dataset);
+  }
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   // // console.log("ForcePage, shouldComponentUpdate", !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links && nextProps.relationSelected === this.props.relationSelected))
+  //   // return !(nextProps.nodes === this.props.nodes && nextProps.links === this.props.links);
+  // }
+
+  onResize = () => {
+    this.chart(this.dataset);
+    // this.table(this.dataset);
+  }
+
+  chart(dataset) {
+
 
     let nodesById = dataset.nodes.reduce((acc, el) => {
       acc[el.id] = el;
       return acc;
     }, {});
-    console.log("nodesById", nodesById);
+    // console.log("nodesById", nodesById);
     // let groupedBySource = d3.nest().key(d=>d.source).entries(dataset.links);
 
     const element = this.viz || document.querySelector('body');
     d3.select(element).selectAll("*").remove();
     const margin = { top: 0, right: 25, bottom: 0, left: 25 };
     // set up SVG for D3
-    const width = element.offsetWidth - (margin.left + margin.right) * 2;
+    const width = (element.offsetWidth - (margin.left + margin.right) * 2);
     const height = 700;
     // const colors = d3.scaleOrdinal(d3.schemeCategory10);
     const colors = d3.scaleOrdinal() //=d3.scaleOrdinal(d3.schemeSet2)
@@ -144,23 +152,190 @@ class D3ForceChart extends Component {
       .on("drag", dragged)      //drag - after an active pointer moves (on mousemove or touchmove).
       .on('end', dragend)
       ;
+
+      
+function constant(_) {
+  return function () { return _ }
+}
+
+
+function rectCollide() {
+  var nodes, sizes, masses
+  var size = constant([0, 0])
+  var strength = 1
+  var iterations = 1
+
+  function force() {
+      var node, size, mass, xi, yi
+      var i = -1
+      while (++i < iterations) { iterate() }
+
+      function iterate() {
+          var j = -1
+          var tree = d3.quadtree(nodes, xCenter, yCenter).visitAfter(prepare)
+
+          while (++j < nodes.length) {
+              node = nodes[j]
+              size = sizes[j]
+              mass = masses[j]
+              xi = xCenter(node)
+              yi = yCenter(node)
+
+              tree.visit(apply)
+          }
+      }
+
+      function apply(quad, x0, y0, x1, y1) {
+          var data = quad.data
+          var xSize = (size[0] + quad.size[0]) / 2
+          var ySize = (size[1] + quad.size[1]) / 2
+          if (data) {
+              if (data.index <= node.index) { return }
+
+              var x = xi - xCenter(data)
+              var y = yi - yCenter(data)
+              var xd = Math.abs(x) - xSize
+              var yd = Math.abs(y) - ySize
+
+              if (xd < 0 && yd < 0) {
+                  var l = Math.sqrt(x * x + y * y)
+                  var m = masses[data.index] / (mass + masses[data.index])
+
+                  if (Math.abs(xd) < Math.abs(yd)) {
+                      node.vx -= (x *= xd / l * strength) * m
+                      data.vx += x * (1 - m)
+                  } else {
+                      node.vy -= (y *= yd / l * strength) * m
+                      data.vy += y * (1 - m)
+                  }
+              }
+          }
+
+          return x0 > xi + xSize || y0 > yi + ySize ||
+                 x1 < xi - xSize || y1 < yi - ySize
+      }
+
+      function prepare(quad) {
+          if (quad.data) {
+              quad.size = sizes[quad.data.index]
+          } else {
+              quad.size = [0, 0]
+              var i = -1
+              while (++i < 4) {
+                  if (quad[i] && quad[i].size) {
+                      quad.size[0] = Math.max(quad.size[0], quad[i].size[0])
+                      quad.size[1] = Math.max(quad.size[1], quad[i].size[1])
+                  }
+              }
+          }
+      }
+  }
+
+  function xCenter(d) { return d.x + d.vx + sizes[d.index][0] / 2 }
+  function yCenter(d) { return d.y + d.vy + sizes[d.index][1] / 2 }
+
+  force.initialize = function (_) {
+      sizes = (nodes = _).map(size)
+      masses = sizes.map(function (d) { return d[0] * d[1] })
+  }
+
+  force.size = function (_) {
+      return (arguments.length
+           ? (size = typeof _ === 'function' ? _ : constant(_), force)
+           : size)
+  }
+
+  force.strength = function (_) {
+      return (arguments.length ? (strength = +_, force) : strength)
+  }
+
+  force.iterations = function (_) {
+      return (arguments.length ? (iterations = +_, force) : iterations)
+  }
+
+  return force
+}
+
+function boundedBox() {
+  var nodes, sizes
+  var bounds
+  var size = constant([0, 0])
+
+  function force() {
+      var node, size
+      var xi, x0, x1, yi, y0, y1
+      var i = -1
+      while (++i < nodes.length) {
+          node = nodes[i]
+          size = sizes[i]
+          xi = node.x + node.vx
+          x0 = bounds[0][0] - xi
+          x1 = bounds[1][0] - (xi + size[0])
+          yi = node.y + node.vy
+          y0 = bounds[0][1] - yi
+          y1 = bounds[1][1] - (yi + size[1])
+          if (x0 > 0 || x1 < 0) {
+              node.x += node.vx
+              node.vx = -node.vx
+              if (node.vx < x0) { node.x += x0 - node.vx }
+              if (node.vx > x1) { node.x += x1 - node.vx }
+          }
+          if (y0 > 0 || y1 < 0) {
+              node.y += node.vy
+              node.vy = -node.vy
+              if (node.vy < y0) { node.vy += y0 - node.vy }
+              if (node.vy > y1) { node.vy += y1 - node.vy }
+          }
+      }
+  }
+
+  force.initialize = function (_) {
+      sizes = (nodes = _).map(size)
+  }
+
+  force.bounds = function (_) {
+      return (arguments.length ? (bounds = _, force) : bounds)
+  }
+
+  force.size = function (_) {
+      return (arguments.length
+           ? (size = typeof _ === 'function' ? _ : constant(_), force)
+           : size)
+  }
+
+  return force
+}
+
+var collisionForce = rectCollide()
+    .size(function (d) { return [lineWidthScale(d.value) * 2, lineWidthScale(d.value) * 2] })
+
+var boxForce = boundedBox()
+    .bounds([[17, 17], [width - 17, height - 17]])
+    .size(function (d) { return [lineWidthScale(d.value) * 2, lineWidthScale(d.value) * 2] })
+
+
     // init D3 force layout
     const forceSimulation = d3.forceSimulation()
+    // .velocityDecay(0)
+      .alphaTarget(0)
+      // .alpha(0.1)
       .force("link", d3.forceLink()
         .id(d => d.id)
-        .distance(150)
+        .distance(200)
       )
-      .force("charge", d3.forceManyBody().strength(-700)) // This adds repulsion (if it's negative) between nodes. 
+      .force("charge", d3.forceManyBody().strength(-500)) // This adds repulsion (if it's negative) between nodes. 
       // .force("center", d3.forceCenter(width / 2, height / 2)) // This force attracts nodes to the center of the svg area
       .force('x', d3.forceX().x(function (d) {
         return width / 2
-      }).strength(0.1))
+      }).strength(0.2))
       .force('y', d3.forceY().y(d => {
         return yCenter[d.category]
-      }).strength(0.5))
-      .force('collision', d3.forceCollide().radius(function (d) {
-        return 17 + d.value / 10;
-      }))
+      }).strength(0.2))
+      // .force('collision', d3.forceCollide().radius(function (d) {
+      //   return 17 + d.value / 10;
+      // }))
+      .force('box', boxForce)
+      .force('collision', collisionForce)
       .on('tick', ticked);
 
 
@@ -202,6 +377,7 @@ class D3ForceChart extends Component {
     let sourceNode = null;
     let targetNode = null;
     let defaultNodeWeight = 40;
+    let maxVelocity = 20
 
     function resetMouseVars() {
       sourceNode = null;
@@ -209,9 +385,48 @@ class D3ForceChart extends Component {
       mousedownLink = null;
     }
 
-    // update force layout (called automatically each iteration)
-    function ticked() {
+    setInterval(function(){
+      forceSimulation.alpha(0.1);
+    },250);
 
+    // update force layout (called automatically each iteration)
+
+    function ticked() {
+      
+	    var alpha = this.alpha();
+      node
+      .each(d => {
+        if(d.new){
+          // d.vx = d.x + Math.random()/10;
+          // d.vy = d.y + Math.random()/10;
+          // d.x = d.x + d.vx * 5;
+          // d.y = d.y + d.vy * 5;
+          let k = 0.01;
+          let node = d;
+          node.vx -= node.x * k;
+          node.vy -= node.y * k;
+          // let vx = 1;
+          // let vy = 1;
+    // var vScalingFactor = 1.1 * maxVelocity / Math.max(Math.sqrt(vx * vx + vy * vy), maxVelocity);
+    // console.log(vScalingFactor);
+    // // d.fx = null
+    // // d.fy = null
+    // d.vx = d.vx * vScalingFactor;
+    // d.vy = d.vy * vScalingFactor;
+    // let velocityDecay = Math.random();
+    // let node = d;
+
+    // if (node.fx == null) { node.x += node.vx *= velocityDecay; }
+    // else { node.x = node.fx; node.vx = 0; }
+    // if (node.fy == null) {node.y += node.vy *= velocityDecay; }
+    // else { node.y = node.fy; node.vy = 0; }
+
+        }else{
+          d.vx = d.vx * 0;
+          d.vy = d.vy * 0;
+        }
+      })
+      .attr('transform', (d) => `translate(${d && d.x ? d.x : 0},${d && d.y ? d.y : 0})`);
       path
         .each(d => {
           // Total difference in x and y from source to target
@@ -236,12 +451,11 @@ class D3ForceChart extends Component {
         .attr("y2", d => (d.target.y - d.offsetY) || 0);
       // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
 
-      node.attr('transform', (d) => `translate(${d && d.x ? d.x : 0},${d && d.y ? d.y : 0})`);
     }
 
     // update graph (called when needed)
     function restart() {
-      console.log("dataset", dataset);
+      // console.log("dataset", dataset);
       // path (link) group
       path = path.data(dataset.links);
 
@@ -307,7 +521,7 @@ class D3ForceChart extends Component {
 
       circle.append('circle')
         .attr('class', 'node')
-        .attr("id",d=> "circle"+d.id)
+        .attr("id", d => "circle" + d.id)
         .attr('r', d => lineWidthScale(d.value))// 17)// d => lineWidthScale(d.value))
         // .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id))\
 
@@ -348,7 +562,7 @@ class D3ForceChart extends Component {
         })
         .on('mouseup', function (d) {
           if (!sourceNode) return;
-          console.log("d", d, "sourceNode", sourceNode);
+          // console.log("d", d, "sourceNode", sourceNode);
           // needed by FF
           dragLine
             .classed('hidden', true)
@@ -451,7 +665,7 @@ class D3ForceChart extends Component {
 
       //set up dictionary of neighbors
       var neighborTarget = {};
-      console.log("dataset.nodes",dataset.nodes);
+      // console.log("dataset.nodes", dataset.nodes);
       for (let i = 0; i < dataset.nodes.length; i++) {
         let id = dataset.nodes[i].id;
         neighborTarget[id] = dataset.links.filter((d) => d.source === id).map((d) => d.target)
@@ -462,8 +676,8 @@ class D3ForceChart extends Component {
         neighborSource[id] = dataset.links.filter((d) => d.target === id).map((d) => d.source)
       };
 
-      console.log("neighborSource is ", neighborSource);
-      console.log("neighborTarget is ", neighborTarget);
+      // console.log("neighborSource is ", neighborSource);
+      // console.log("neighborTarget is ", neighborTarget);
 
       circle.selectAll("circle").on("click", (d) => {
         // console.log("d",d);
@@ -474,12 +688,12 @@ class D3ForceChart extends Component {
           , newOpacity = active ? 0.6 : 0.3
           , subgraphOpacity = active ? 0.9 : 0;
 
-          console.log("CIRCLE CLICK, ",d, " active ",active);
+        // console.log("CIRCLE CLICK, ", d, " active ", active);
         //extract node's id and ids of its neighbors
         var id = d.id
           , neighborS = neighborSource[id]
           , neighborT = neighborTarget[id];
-        console.log("neighbors is from ", neighborS, " to ", neighborT);
+        // console.log("neighbors is from ", neighborS, " to ", neighborT);
         d3.selectAll("#circle" + id).style("stroke-opacity", newOpacity);
         d3.selectAll("#circle" + id).style("stroke", newStroke);
 
@@ -536,7 +750,7 @@ class D3ForceChart extends Component {
 
       // insert new node at point
       const point = d3.mouse(this);
-      console.log("point,", point);
+      // console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
       const node = { id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true };//reflexive: false,
       dataset.nodes.push(node);
@@ -645,10 +859,52 @@ class D3ForceChart extends Component {
     restart();
   }
 
+  handleChange(event) {
+    // console.log(event.target.value);
+    this.setState({ value: event.target.value });
+  }
+
+  groupItemsRender() {
+    let group = this.nodesByGroups.filter(d => d.key === this.state.value);
+    if (group && group[0] && group[0].values) {
+      group = group[0].values
+    }
+    console.log("group", group);
+    return group.map((d, i) => {
+      return (
+        <div className="group-item" value={d.id} key={d.id + "_" + d.name}>
+          <p>{`Name: ${d.name}`}</p>
+          <p>{`Value: ${d.value}`}</p>
+        </div>
+      )
+    })
+  }
   render() {
     return (
-      <div className="d3-chart-wrapper " id='forceSvg' ref={viz => (this.viz = viz)}>
+      <div className="dash-container">
+        <div className="d3-chart-wrapper " id='forceSvg' ref={viz => (this.viz = viz)}>
+        </div>
+
+        <div
+          id="nodesTable"
+          className="nodes-table-container">
+            <h2 className="container-header">Groups</h2>
+            <select value={this.state.value} onChange={this.handleChange}>
+              {
+                this.nodesByGroups.map((d, i) => {
+                  return (
+                    <option value={d.key} key={d.key + "_" + i}>{d.key}</option>
+                  )
+
+                })
+              } </select>
+            <br />
+            {/* {this.nodesByGroups && this.state.value && } */}
+            {this.groupItemsRender()}
+        </div>
       </div>
+
+
     );
   }
 }

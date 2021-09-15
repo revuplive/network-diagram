@@ -1,3 +1,27 @@
+.dash-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;  
+}
+.d3-chart-wrapper {
+  width: 75%;
+}
+.container-header {
+  margin-top:10px !important;
+}
+.nodes-table-container {
+  border: 1px solid #000;
+  width: 25%;
+}
+
+.group-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 svg {
   border:1px solid #000;
   cursor: default;
