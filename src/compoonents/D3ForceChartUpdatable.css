@@ -5,7 +5,8 @@
   align-items: center;  
 }
 .d3-chart-wrapper {
-  width: 75%;
+  width: calc( 100% - 50px ); /* 75%; */
+  margin: 25px auto;
 }
 .container-header {
   margin-top:10px !important;
