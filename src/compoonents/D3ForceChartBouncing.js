@@ -526,7 +526,7 @@ class D3ForceChart extends Component {
           // unenlarge target node
           // d3.select(this).attr('transform', '');
           setTimeout(() => {
-            if(targetNode && !targetNode.new){
+            if (targetNode && !targetNode.new) {
               targetNode.value = targetNode.value + sourceNode.value;
               recursive(sourceNode.value, targetNode);
               restart()
@@ -681,8 +681,8 @@ class D3ForceChart extends Component {
       // console.log("dataset", dataset);
       // path (link) group
       let valueExtent = d3.extent(dataset.nodes, (d) => d.value);
-       lineStrokeScale.domain(valueExtent);
-     lineWidthScale.domain(valueExtent)
+      lineStrokeScale.domain(valueExtent);
+      lineWidthScale.domain(valueExtent)
 
       path = path.data(dataset.links);
 
@@ -737,7 +737,7 @@ class D3ForceChart extends Component {
         .style("fill", d => colors(d.group))
         .style("stroke-opacity", 0.3)
         .style('stroke', 'grey')//(d) => d3.rgb(colors(d.id)).darker().toString())
-        .style("stroke-width",  d => lineStrokeScale(d.value))//lineWidthScale(d.value))//d.value/10)
+        .style("stroke-width", d => lineStrokeScale(d.value))//lineWidthScale(d.value))//d.value/10)
         // .classed('reflexive', (d) => d.reflexive)
         // .on('mouseover', function (d) {
         //   if (!sourceNode || d === sourceNode) return;
@@ -824,7 +824,7 @@ class D3ForceChart extends Component {
             // });
           } else if (alreadyConnected.length) {
             console.log("alreadyConnected.length");
-            if(sourceNode.new){
+            if (sourceNode.new) {
               console.log("sourceNode.new");
               sourceNode.new = false;
               sourceNode.vx = 0;
@@ -835,8 +835,8 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
-            }            
-            if(targetNode.new){
+            }
+            if (targetNode.new) {
               console.log("targetNode.new");
               targetNode.new = false;
               targetNode.vx = 0;
@@ -856,7 +856,7 @@ class D3ForceChart extends Component {
             // no value recalculation
           } else if (directLink.length === 0) {
             console.log("directLink.length === 0");
-            if(sourceNode.new){
+            if (sourceNode.new) {
               console.log("sourceNode.new");
               sourceNode.new = false;
               sourceNode.vx = 0;
@@ -867,8 +867,8 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
-            }            
-            if(targetNode.new){
+            }
+            if (targetNode.new) {
               console.log("targetNode.new");
               targetNode.new = false;
               targetNode.vx = 0;
@@ -1165,7 +1165,7 @@ class D3ForceChart extends Component {
         <div className="d3-chart-wrapper " id='forceSvg' ref={viz => (this.viz = viz)}>
         </div>
 
-        <div
+        {/* <div
           id="nodesTable"
           className="nodes-table-container">
           <h2 className="container-header">Groups</h2>
@@ -1179,12 +1179,10 @@ class D3ForceChart extends Component {
               })
             } </select>
           <br />
-          {/* {this.nodesByGroups && this.state.value && } */}
           {this.groupItemsRender()}
-        </div>
+        </div> */}
+
       </div>
-
-
     );
   }
 }
