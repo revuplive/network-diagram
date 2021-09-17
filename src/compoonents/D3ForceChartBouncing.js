@@ -323,7 +323,7 @@ class D3ForceChart extends Component {
             targetNode = randomNode;
             d3.selectAll(".node")//.selectAll(`#circle${targetNode.id}`)
               .style("stroke", function (d) {
-                if (d.id === targetNode.id) {
+                if (d && d.id && d.id === targetNode.id) {
                   d3.select(this).transition().delay(animationDuration).style("stroke", "grey");
                   return "red";
                 }
