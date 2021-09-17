@@ -149,7 +149,7 @@ class D3ForceChart extends Component {
       ;
 
     svg.append("text")
-      .text("Chart example v3")
+      .text("Chart example v4")
       .attr("text-anchor", "middle")
       .attr("x", width / 2)
       .attr("y", 25)
