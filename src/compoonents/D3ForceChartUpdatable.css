@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .dash-container {
   display: flex;
   flex-direction: row;
@@ -86,6 +87,8 @@ text.id {
   font-weight: bold;
 }
 =======
+=======
+>>>>>>> 5f85a72a181bd4706ba4a38de4a2cedcf9c4510e
 .dash-container {
   display: flex;
   flex-direction: row;
@@ -172,4 +175,7 @@ text.id {
   text-anchor: middle;
   font-weight: bold;
 }
+<<<<<<< HEAD
 >>>>>>> 92024ce62d436435558a563c7f2ad8f31ecf2f1c
+=======
+>>>>>>> 5f85a72a181bd4706ba4a38de4a2cedcf9c4510e
