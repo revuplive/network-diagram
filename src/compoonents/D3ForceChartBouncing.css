@@ -95,9 +95,14 @@ circle.node {
   cursor: pointer;
 }
 
+
 circle.node.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
+}
+
+.node.active {
+  stroke: red;
 }
 
 text {
