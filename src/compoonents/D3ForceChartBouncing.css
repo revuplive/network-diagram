@@ -1,3 +1,50 @@
+.dash-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;  
+}
+.d3-chart-wrapper {
+  width:  75%;/* calc( 100% - 50px ); */
+  margin: 25px auto;
+}
+.container-header {
+  margin-top: 0 !important;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.tableHeaderContainer {
+  display: flex;
+  justify-content: space-evenly;
+}
+.container-header-item {
+  background-color: grey;
+  color: #fff;
+  width: 33.3%;
+  cursor: pointer;
+}
+.container-header-item.active {
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  color: black;
+  background-color: #fff;
+}
+.nodes-table-container {
+  /* border: 1px solid #000; */
+  margin: 0 auto;
+  width: calc(25% - 50px);
+}
+
+.group-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 svg {
   border:1px solid #000;
   cursor: default;
