@@ -87,12 +87,12 @@ class D3ForceChart extends Component {
     }, {});
 
     let nodesByGroups = d3.nest().key(d => d.group).entries(dataset.nodes);
-    console.log("nodesByGroups", nodesByGroups);
+    // console.log("nodesByGroups", nodesByGroups);
     that.selectedGroup = that.selectedGroup || "Team A";
 
     that.group = nodesByGroups.filter(d => d.key === that.selectedGroup);
     that.groupValues = that.group[0].values;
-    console.log("groupValues", that.groupValues);
+    // console.log("groupValues", that.groupValues);
 
     const element = this.viz || document.querySelector('body');
     const chartElement = this.chartViz || document.querySelector('body');
@@ -142,7 +142,7 @@ class D3ForceChart extends Component {
       .attr("class", d => d.key === that.selectedGroup ? "container-header-item active" : "container-header-item")
       .text(d => d.key)
       .on("click", (d) => {
-        console.log("handleChange", d);
+        // console.log("handleChange", d);
         that.selectedGroup = d.key;
         restart();
       })
@@ -296,7 +296,7 @@ class D3ForceChart extends Component {
       let ball1 = thisobj;
       this.dataset.nodes.forEach(ball2 => {
         if (ball1.id !== ball2.id && checkCollision(ball1, ball2)) {
-          console.log("checkCollision happened");
+          // console.log("checkCollision happened");
 
           // needed by FF
           dragLine
@@ -336,7 +336,7 @@ class D3ForceChart extends Component {
         
 
             that.selectedGroup = targetNode.group;
-            console.log("that.selectedGroup checkCollision", that.selectedGroup);
+            // console.log("that.selectedGroup checkCollision", that.selectedGroup);
             targetNode.value = targetNode.value + sourceNode.value;
             recursive(sourceNode.value, targetNode);
             restart()
@@ -379,7 +379,7 @@ class D3ForceChart extends Component {
         .each(d => {
           if (d.new) {
             move(d);
-            console.log();
+            // console.log();
           }
 
         })
@@ -410,7 +410,7 @@ class D3ForceChart extends Component {
     function updateGroupItem() {
       that.group = nodesByGroups.filter(d => d.key === that.selectedGroup);
       that.groupValues = that.group[0].values;
-      console.log("updateGroupItem", that.selectedGroup, nodesByGroups, that.groupValues);
+      // console.log("updateGroupItem", that.selectedGroup, nodesByGroups, that.groupValues);
 
       chartDiv.selectAll('.container-header-item')
         .attr("class", d => d.key === that.selectedGroup ? "container-header-item active" : "container-header-item");
@@ -429,7 +429,7 @@ class D3ForceChart extends Component {
         groupWrapper = nodeEnter.merge(groupWrapper); // enter + update on the g
 
         groupWrapper.style("background-color", d => {
-        console.log("NODE D", d, "targetNode", targetNode, "sourceNode", sourceNode);
+        // console.log("NODE D", d, "targetNode", targetNode, "sourceNode", sourceNode);
         return !!(targetNode && d.id === targetNode.id) || !!(sourceNode && d.id === sourceNode.id) ? colors(d.group) : "transparent"
       });
 
@@ -559,19 +559,19 @@ class D3ForceChart extends Component {
           const alreadyConnected = dataset.links.filter((l) => l.source.id === sourceNode.id);
 
           if (directLink.length) {
-            console.log("directLink.length");
+            // console.log("directLink.length");
             // no events
           } else if (reverseLink.length) {
-            console.log("reverseLink.length");
+            // console.log("reverseLink.length");
             let sourceNodeWeight = sourceNode.value;
             sourceNode.value = targetNode.value;
             targetNode.value = sourceNodeWeight;// remove inversed link to current link
             reverseLink[0].source = sourceNode;
             reverseLink[0].target = targetNode;
           } else if (alreadyConnected.length) {
-            console.log("alreadyConnected.length");
+            // console.log("alreadyConnected.length");
             if (sourceNode.new) {
-              console.log("sourceNode.new");
+              // console.log("sourceNode.new");
               sourceNode.new = false;
               sourceNode.vx = 0;
               sourceNode.vy = 0;
@@ -584,7 +584,7 @@ class D3ForceChart extends Component {
               // that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
-              console.log("targetNode.new");
+              // console.log("targetNode.new");
               targetNode.new = false;
               targetNode.vx = 0;
               targetNode.vy = 0;
@@ -603,9 +603,9 @@ class D3ForceChart extends Component {
             targetNode.value = sourceNode.value + targetNode.value;
             // no value recalculation
           } else if (directLink.length === 0) {
-            console.log("directLink.length === 0");
+            // console.log("directLink.length === 0");
             if (sourceNode.new) {
-              console.log("sourceNode.new");
+              // console.log("sourceNode.new");
               sourceNode.new = false;
               sourceNode.vx = 0;
               sourceNode.vy = 0;
@@ -618,7 +618,7 @@ class D3ForceChart extends Component {
               // that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
-              console.log("targetNode.new");
+              // console.log("targetNode.new");
               targetNode.new = false;
               targetNode.vx = 0;
               targetNode.vy = 0;
@@ -739,23 +739,26 @@ class D3ForceChart extends Component {
 
       // insert new node at point
       const point = d3.mouse(this);
+      let xPosition =  point[0] || 60;
+      let yPosition =  point[1] || 60;
       // console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
-      const aoa = Math.PI / getRandomInt(9);
+      const aoa = Math.PI / (getRandomInt(9) || 1);
       const jumpSize = 2;
       const node = {
-        id: (Date.now()), x: point[0], y: point[1], value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true,
+        id: (Date.now()), x: xPosition , y:yPosition, value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true,
         jumpSize,
         aoa,
         _vx: Math.cos(aoa) * jumpSize,
         _vy: Math.sin(aoa) * jumpSize,
         vx: 0,
         vy: 0,
-        fx: point[0],
-        fy: point[1],
-        posX: point[0],
-        posY: point[1],
+        fx: xPosition,
+        fy: yPosition,
+        posX: xPosition,
+        posY: yPosition,
       };//reflexive: false,
+      console.log("NEW NODE ", node);
       dataset.nodes.push(node);
       nodesByGroups = d3.nest().key(d => d.group).entries(dataset.nodes);
       nodesById[node.id] = node;
