@@ -71,7 +71,6 @@ class D3ForceChart extends Component {
       ]
     };
     // this.nodesByGroups = d3.nest().key(d => d.group).entries(this.dataset.nodes);
-    // console.log("nodesByGroups", this.nodesByGroups);
 
   }
 
@@ -151,7 +150,7 @@ class D3ForceChart extends Component {
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       ;
-    
+
     d3.select(chartElement).selectAll("*").remove();
     const chartDiv = d3.select(chartElement)
       .append("div")
@@ -1303,6 +1302,7 @@ class D3ForceChart extends Component {
           ref={chartViz => (this.chartViz = chartViz)}
         >
           {/* <select value={this.state.value} onChange={this.handleChange}>
+
             {
               this.nodesByGroups.map((d, i) => {
                 return (
@@ -1314,6 +1314,7 @@ class D3ForceChart extends Component {
           {/* <br /> */}
           {/* {that.groupItemsRender()} */}
         </div>
+
 
       </div>
     );
