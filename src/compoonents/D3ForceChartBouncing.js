@@ -15,9 +15,9 @@ class D3ForceChart extends Component {
       nodes: [
         { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team B', value: 20, category: 2 },
         { id: 2, name: 'ASMT', label: 'Assessment Repository', group: 'Team A', value: 60, category: 1 },
-        { id: 3, name: 'CALC', label: 'Final Calc', group: 'Team A', value: 30, category: 3 },
+        { id: 3, name: 'CALC', label: 'Final Calc', group: 'Team C', value: 30, category: 3 },
         { id: 4, name: 'DEMO', label: 'Demographic', group: 'Team B', value: 40, category: 1 },
-        { id: 5, name: 'ELIG', label: 'Eligibility', group: 'Team B', value: 20, category: 2 },
+        { id: 5, name: 'ELIG', label: 'Eligibility', group: 'Team C', value: 20, category: 2 },
         { id: 6, name: 'GOAL', label: 'Goal Setting', group: 'Team A', value: 60, category: 3 },
         { id: 7, name: 'GROW', label: 'Growth Model', group: 'Team B', value: 60, category: 2 },
         { id: 8, name: 'LINK', label: 'Linkage', group: 'Team A', value: 100, category: 4 },
@@ -103,8 +103,8 @@ class D3ForceChart extends Component {
     const height = 700;
     // const colors = d3.scaleOrdinal(d3.schemeCategory10);
     const colors = d3.scaleOrdinal()
-      .domain(["Team A", "Team B", "Team C"])
-      .range(['#ff9e6d', '#86cbff', '#c2e5a0']);
+    .domain(["Team A", "Team B", "Team C", "Team D", "Team E"])
+    .range(['#ff9e6d', '#86cbff', '#c2e5a0', '#9e79db', '#fff686']);
 
     let valueExtent = d3.extent(dataset.nodes, (d) => d.value);
 
@@ -317,9 +317,13 @@ class D3ForceChart extends Component {
           // setTimeout(() => {
           if (targetNode && !targetNode.new) {
 
+            let random = Math.floor(Math.random() * dataset.nodes.length-1);
+            let randomNode = dataset.nodes[random];
+            console.log("targetNode", dataset.nodes, random, dataset.nodes[random]);
+            targetNode = randomNode;
             d3.selectAll(".node")//.selectAll(`#circle${targetNode.id}`)
               .style("stroke", function (d) {
-                if(d.id === targetNode.id){
+                if (d.id === targetNode.id) {
                   d3.select(this).transition().delay(animationDuration).style("stroke", "grey");
                   return "red";
                 }
@@ -333,12 +337,23 @@ class D3ForceChart extends Component {
             //   .transition().duration(animationDuration)
             //   .attr("stroke", "grey");
             //   // }, animationDuration);
-        
 
             that.selectedGroup = targetNode.group;
+
             // console.log("that.selectedGroup checkCollision", that.selectedGroup);
             targetNode.value = targetNode.value + sourceNode.value;
             recursive(sourceNode.value, targetNode);
+
+            dataset.nodes = dataset.nodes.filter(d => {
+              console.log("d", d.id !== sourceNode.id);
+              return d.id !== sourceNode.id
+            });
+            freeNode = false;
+            //.datum();
+            // d3.selectAll().exit().remove()
+            // sournceNodeToRemove.exit().remove();
+            // sournceNodeToRemove.selectAll("*").remove();
+
             restart()
           }
           // }, 200);
@@ -419,16 +434,16 @@ class D3ForceChart extends Component {
       let groupWrapper = chartDiv.selectAll(".group-item") // bind the data, this is update
         .data(that.groupValues, d => d.id);
 
-        groupWrapper.exit().remove(); // exit, remove the g
+      groupWrapper.exit().remove(); // exit, remove the g
 
       let nodeEnter = groupWrapper.enter() // enter, append the g
         .append("div")
         .attr("class", "group-item")
         .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
 
-        groupWrapper = nodeEnter.merge(groupWrapper); // enter + update on the g
+      groupWrapper = nodeEnter.merge(groupWrapper); // enter + update on the g
 
-        groupWrapper.style("background-color", d => {
+      groupWrapper.style("background-color", d => {
         // console.log("NODE D", d, "targetNode", targetNode, "sourceNode", sourceNode);
         return !!(targetNode && d.id === targetNode.id) ? colors(d.group) : "transparent"// || !!(sourceNode && d.id === sourceNode.id)
       });
@@ -451,7 +466,7 @@ class D3ForceChart extends Component {
       //         .transition().duration(animationDuration)
       //         .attr("stroke", "grey");
       //         // }, animationDuration);
-        
+
       // }
 
 
@@ -731,6 +746,13 @@ class D3ForceChart extends Component {
     function getRandomInt(max) {
       return Math.floor(Math.random() * max);
     }
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function mousedown() {
       // because :active only works in WebKit?
       // svg.classed('active', true);
@@ -739,14 +761,16 @@ class D3ForceChart extends Component {
 
       // insert new node at point
       const point = d3.mouse(this);
-      let xPosition =  point[0] || 60;
-      let yPosition =  point[1] || 60;
+      // let xPosition =  point[0] || 60;
+      // let yPosition =  point[1] || 60;
+      let xPosition = 60; //point[0] || 60;
+      let yPosition = point[1] || 60;
       // console.log("point,", point);
       //id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category:2
-      const aoa = Math.PI / (getRandomInt(9) || 1);
+      const aoa = Math.PI / (getRandomInt(3,9) || 1);
       const jumpSize = 2;
       const node = {
-        id: (Date.now()), x: xPosition , y:yPosition, value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team C', new: true,
+        id: (Date.now()), x: xPosition, y: yPosition, value: defaultNodeWeight, name: 'new node', label: 'new node', category: 2, group: 'Team D', new: true,
         jumpSize,
         aoa,
         _vx: Math.cos(aoa) * jumpSize,
