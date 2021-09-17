@@ -417,6 +417,7 @@ class D3ForceChart extends Component {
       .force("link", d3.forceLink()
         .id(d => d.id)
         // .distance(d => distanceScale(d.source ? d.source.value : d.value))
+        .distance(140)
       )
       .force("charge", d3.forceManyBody().strength(-400)) // This adds repulsion (if it's negative) between nodes. 
       .force("center", d3.forceCenter(width / 2, height / 2)) // This force attracts nodes to the center of the svg area
