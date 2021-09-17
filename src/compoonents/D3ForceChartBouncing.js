@@ -430,7 +430,7 @@ class D3ForceChart extends Component {
 
         groupWrapper.style("background-color", d => {
         // console.log("NODE D", d, "targetNode", targetNode, "sourceNode", sourceNode);
-        return !!(targetNode && d.id === targetNode.id) || !!(sourceNode && d.id === sourceNode.id) ? colors(d.group) : "transparent"
+        return !!(targetNode && d.id === targetNode.id) ? colors(d.group) : "transparent"// || !!(sourceNode && d.id === sourceNode.id)
       });
 
       groupWrapper
