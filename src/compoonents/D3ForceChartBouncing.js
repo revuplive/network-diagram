@@ -150,7 +150,6 @@ class D3ForceChart extends Component {
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       ;
-
     d3.select(chartElement).selectAll("*").remove();
     const chartDiv = d3.select(chartElement)
       .append("div")
@@ -418,6 +417,7 @@ class D3ForceChart extends Component {
       .force("link", d3.forceLink()
         .id(d => d.id)
         // .distance(d => distanceScale(d.source ? d.source.value : d.value))
+        .distance(140)
       )
       .force("charge", d3.forceManyBody().strength(-400)) // This adds repulsion (if it's negative) between nodes. 
       .force("center", d3.forceCenter(width / 2, height / 2)) // This force attracts nodes to the center of the svg area
@@ -771,12 +771,16 @@ class D3ForceChart extends Component {
     
       node = nodeEnter.merge(node); // enter + update on the g
     
-      // node.attr('transform', function(d){ // enter + update, position the g
-      //   return 'translate(' + d.x + ',' + d.y + ')';
-      // });
+      node.style("background-color",d=>{
+        console.log("NODE D",d,"targetNode",targetNode,"sourceNode",sourceNode);
+        return !!(targetNode && d.id === targetNode.id) || !!(sourceNode && d.id === sourceNode.id)  ? colors(d.group): "transparent"
+      });
     
-      node.select(".group-item") // enter + update on subselection
-        .attr("value", d => d.id)
+      node
+      // .append("div")
+      // .attr("class", "group-item")
+      // .select(".group-item") // enter + update on subselection
+        // .attr("value", d => d.id)
         .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
     
       // tabElement.exit();
@@ -1302,7 +1306,6 @@ class D3ForceChart extends Component {
           ref={chartViz => (this.chartViz = chartViz)}
         >
           {/* <select value={this.state.value} onChange={this.handleChange}>
-
             {
               this.nodesByGroups.map((d, i) => {
                 return (
@@ -1314,7 +1317,6 @@ class D3ForceChart extends Component {
           {/* <br /> */}
           {/* {that.groupItemsRender()} */}
         </div>
-
 
       </div>
     );
