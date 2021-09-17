@@ -79,7 +79,7 @@ class D3ForceChart extends Component {
 
   chart(dataset) {
     let that = this;
-    let animationDuration = 500;
+    let animationDuration = 2000;
     let freeNode = false;
     let nodesById = dataset.nodes.reduce((acc, el) => {
       acc[el.id] = el;
@@ -318,7 +318,14 @@ class D3ForceChart extends Component {
           if (targetNode && !targetNode.new) {
 
             d3.selectAll(".node")//.selectAll(`#circle${targetNode.id}`)
-              .style("stroke",d=> d.id === targetNode.id ? "red" : "grey");
+              .style("stroke", function (d) {
+                if(d.id === targetNode.id){
+                  d3.select(this).transition().delay(animationDuration).style("stroke", "grey");
+                  return "red";
+                }
+                return "grey";
+                // d.id === targetNode.id ? "red" : "grey"
+              });
             // .attr("class", d=> d.id === sourceNode.id ? "node collision" : "node");
 
             // // setInterval(() => {
@@ -574,7 +581,7 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
-              that.selectedGroup = sourceNode.group;
+              // that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
               console.log("targetNode.new");
@@ -608,7 +615,7 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
-              that.selectedGroup = sourceNode.group;
+              // that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
               console.log("targetNode.new");
@@ -753,7 +760,7 @@ class D3ForceChart extends Component {
       nodesByGroups = d3.nest().key(d => d.group).entries(dataset.nodes);
       nodesById[node.id] = node;
       freeNode = true;
-      that.selectedGroup = node.group;
+      // that.selectedGroup = node.group;
       restart();
     }
 
