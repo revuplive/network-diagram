@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 import * as d3 from 'd3';
 // import './D3forceChart.css';
-import './D3ForceChartUpdatable.css';
+// import './D3ForceChartUpdatable.css';
+import './D3ForceChartBouncing.css';
 
 class D3ForceChart extends Component {
   constructor(props) {
@@ -10,7 +11,7 @@ class D3ForceChart extends Component {
     this.state = {
       value: 'Team A'
     };
-    this.handleChange = this.handleChange.bind(this);
+    // this.handleChange = this.handleChange.bind(this);
     // this.positions = {};
     // set up initial nodes and links
     //  - nodes are known by 'id', not by index in array.
@@ -25,19 +26,19 @@ class D3ForceChart extends Component {
     // this
     this.dataset = {
       nodes: [
-        { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team C', value: 20, category: 2 },
+        { id: 1, name: 'AGGR', label: 'Aggregation', group: 'Team B', value: 20, category: 2 },
         { id: 2, name: 'ASMT', label: 'Assessment Repository', group: 'Team A', value: 60, category: 1 },
-        { id: 3, name: 'CALC', label: 'Final Calc', group: 'Team C', value: 30, category: 3 },
+        { id: 3, name: 'CALC', label: 'Final Calc', group: 'Team A', value: 30, category: 3 },
         { id: 4, name: 'DEMO', label: 'Demographic', group: 'Team B', value: 40, category: 1 },
         { id: 5, name: 'ELIG', label: 'Eligibility', group: 'Team B', value: 20, category: 2 },
-        { id: 6, name: 'GOAL', label: 'Goal Setting', group: 'Team C', value: 60, category: 3 },
-        { id: 7, name: 'GROW', label: 'Growth Model', group: 'Team C', value: 60, category: 2 },
+        { id: 6, name: 'GOAL', label: 'Goal Setting', group: 'Team A', value: 60, category: 3 },
+        { id: 7, name: 'GROW', label: 'Growth Model', group: 'Team B', value: 60, category: 2 },
         { id: 8, name: 'LINK', label: 'Linkage', group: 'Team A', value: 100, category: 4 },
         { id: 9, name: 'MOSL', label: 'MOSL', group: 'Team A', value: 80, category: 2 },
         { id: 10, name: 'MOTP', label: 'MOTP', group: 'Team A', value: 20, category: 1 },
-        { id: 11, name: 'REPT', label: 'Reporting', group: 'Team D', value: 240, category: 4 },
+        { id: 11, name: 'REPT', label: 'Reporting', group: 'Team B', value: 240, category: 4 },
         { id: 12, name: 'SEDD', label: 'State Data', group: 'Team A', value: 30, category: 1 },
-        { id: 13, name: 'SNAP', label: 'Snapshot', group: 'Team A', value: 40, category: 0 }
+        { id: 13, name: 'SNAP', label: 'Snapshot', group: 'Team C', value: 40, category: 0 }
       ], links: [
         { source: 1, target: 3 },
         { source: 6, target: 1 },
@@ -69,7 +70,7 @@ class D3ForceChart extends Component {
         { source: 5, target: 3 }
       ]
     };
-    this.nodesByGroups = d3.nest().key(d => d.group).entries(this.dataset.nodes);
+    // this.nodesByGroups = d3.nest().key(d => d.group).entries(this.dataset.nodes);
     // console.log("nodesByGroups", this.nodesByGroups);
 
   }
@@ -105,7 +106,7 @@ class D3ForceChart extends Component {
   }
 
   chart(dataset) {
-
+    let that = this;
 
     let freeNode = false;
     let nodesById = dataset.nodes.reduce((acc, el) => {
@@ -115,7 +116,18 @@ class D3ForceChart extends Component {
     // console.log("nodesById", nodesById);
     // let groupedBySource = d3.nest().key(d=>d.source).entries(dataset.links);
 
+    let nodesByGroups = d3.nest().key(d => d.group).entries(dataset.nodes);
+    console.log("nodesByGroups", nodesByGroups);
+    that.selectedGroup = that.selectedGroup || "Team A";
+
+    that.group = nodesByGroups.filter(d => d.key === that.selectedGroup);
+    that.groupValues = that.group[0].values;
+    console.log("groupValues", that.groupValues);
+    // let groupHeaders = nodesByGroups.map(d => d.key);
+    // console.log("groupHeaders", groupHeaders);
+
     const element = this.viz || document.querySelector('body');
+    const chartElement = this.chartViz || document.querySelector('body');
     d3.select(element).selectAll("*").remove();
     const margin = { top: 0, right: 0, bottom: 0, left: 0 };
     // set up SVG for D3
@@ -139,6 +151,64 @@ class D3ForceChart extends Component {
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       ;
+    
+    d3.select(chartElement).selectAll("*").remove();
+    const chartDiv = d3.select(chartElement)
+      .append("div")
+      .attr("class", "table-div")
+      .style('border', "1px solid #000")
+      // .style('width', "25%")
+      ;
+    chartDiv
+      .append("h2")
+      .attr("class", "container-header")
+      .text("Groups");
+
+    let tableHeaderContainer = chartDiv
+      .append("div")
+      .attr("class", "tableHeaderContainer");
+
+    tableHeaderContainer
+      .selectAll('div')
+      .data(nodesByGroups, d => d.key)
+      .enter()
+      .append("div")
+      .attr("class", d => d.key === that.selectedGroup ? "container-header-item active" : "container-header-item")
+      // .attr("key", d => {
+      //   console.log("d0,", d);
+      //   return d
+      // })
+      .text(d => d.key)
+      .on("click", (d) => {
+        console.log("handleChange", d);
+        that.selectedGroup = d.key;
+        restart();
+      })
+      ;
+
+    // chartDiv
+    //   .append("br");
+
+    // groupItemsRender() {
+    //   let group = this.nodesByGroups.filter(d => d.key === this.state.value);
+    //   if (group && group[0] && group[0].values) {
+    //     group = group[0].values
+    //   }
+    //   console.log("group", group);
+    //   return group.map((d, i) => {
+    //     return (
+    //       <div className="group-item" value={d.id} key={d.id + "_" + d.name}>
+    //         <p>{`Name: ${d.name}`}</p>
+    //         <p>{`Value: ${d.value}`}</p>
+    //       </div>
+    //     )
+    //   })
+    // }
+
+
+    //   <option value={d.key} key={d.key + "_" + i}>{d.key}</option>
+    // <select value={this.state.value} onChange={this.handleChange}>
+
 
     svg.append("text")
       .text("Chart example v3")
@@ -348,7 +418,7 @@ class D3ForceChart extends Component {
       // .alpha(0.1)
       .force("link", d3.forceLink()
         .id(d => d.id)
-        .distance(d => distanceScale(d.source ? d.source.value : d.value))
+        // .distance(d => distanceScale(d.source ? d.source.value : d.value))
       )
       .force("charge", d3.forceManyBody().strength(-400)) // This adds repulsion (if it's negative) between nodes. 
       .force("center", d3.forceCenter(width / 2, height / 2)) // This force attracts nodes to the center of the svg area
@@ -491,7 +561,6 @@ class D3ForceChart extends Component {
         if (ball1.id !== ball2.id && checkCollision(ball1, ball2)) {
           console.log("checkCollision happened");
 
-
           // console.log("d", d, "sourceNode", sourceNode);
           // needed by FF
           dragLine
@@ -525,13 +594,15 @@ class D3ForceChart extends Component {
 
           // unenlarge target node
           // d3.select(this).attr('transform', '');
-          setTimeout(() => {
+          // setTimeout(() => {
             if (targetNode && !targetNode.new) {
+              that.selectedGroup = targetNode.group;
+              console.log("that.selectedGroup checkCollision", that.selectedGroup);
               targetNode.value = targetNode.value + sourceNode.value;
               recursive(sourceNode.value, targetNode);
               restart()
             }
-          }, 200);
+          // }, 200);
 
           // dataset.links.forEach( link => {
           //   if(sourceNode.id === link.target){
@@ -675,7 +746,61 @@ class D3ForceChart extends Component {
       // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
 
     }
+    function updateGroupItem() {
+      that.group = nodesByGroups.filter(d => d.key === that.selectedGroup);
+      that.groupValues = that.group[0].values;
+      console.log("updateGroupItem", that.selectedGroup, nodesByGroups, that.groupValues);
 
+      chartDiv.selectAll('.container-header-item')
+        .attr("class", d => d.key === that.selectedGroup ? "container-header-item active" : "container-header-item");
+
+      // https://stackoverflow.com/questions/41625978/d3-v4-update-pattern-for-groups
+      let node = chartDiv.selectAll(".group-item") // bind the data, this is update
+        .data(that.groupValues, d => d.id);
+    
+      node.exit().remove(); // exit, remove the g
+    
+      let nodeEnter = node.enter() // enter, append the g
+        .append("div")
+        .attr("class", "group-item")
+        .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
+    
+      // nodeEnter.append("div")
+      //   // .attr("key", d => `${d.id}_${d.name}`)
+      //   // .attr("value", d => d.id)
+      //   .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
+    
+      node = nodeEnter.merge(node); // enter + update on the g
+    
+      // node.attr('transform', function(d){ // enter + update, position the g
+      //   return 'translate(' + d.x + ',' + d.y + ')';
+      // });
+    
+      node.select(".group-item") // enter + update on subselection
+        .attr("value", d => d.id)
+        .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
+    
+      // tabElement.exit();
+
+    //   groupItem.selectAll("p").remove();
+    //   groupItem.exit();
+
+    // let groupItem = chartDiv
+    //   .selectAll('.group-item')
+    //   .data(that.group)
+    //   .enter()
+    //   .append("div")
+    //   .attr("class", "group-item")
+    //   .attr("key", d => `${d.id}_${d.name}`)
+    //   .attr("value", d => d.id);
+    // groupItem
+    //   .append("p")
+    //   .text(d => `Name: ${d.name}`);
+    // groupItem
+    //   .append("p")
+    //   .text(d => `Value: ${d.value}`);
+
+    }
     // update graph (called when needed)
     function restart() {
       // console.log("dataset", dataset);
@@ -684,8 +809,9 @@ class D3ForceChart extends Component {
       lineStrokeScale.domain(valueExtent);
       lineWidthScale.domain(valueExtent)
 
-      path = path.data(dataset.links);
+      updateGroupItem();
 
+      path = path.data(dataset.links);
 
       // remove old links
       path.exit().remove();
@@ -835,6 +961,7 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
+              that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
               console.log("targetNode.new");
@@ -847,6 +974,7 @@ class D3ForceChart extends Component {
               targetNode.fy = targetNode.y;
               targetNode._vx = 0;
               targetNode._vy = 0;
+              that.selectedGroup = targetNode.group;
             }
             freeNode = false;
             dataset.links.push({
@@ -867,6 +995,7 @@ class D3ForceChart extends Component {
               sourceNode.posY = sourceNode.y;
               sourceNode._vx = 0;
               sourceNode._vy = 0;
+              that.selectedGroup = sourceNode.group;
             }
             if (targetNode.new) {
               console.log("targetNode.new");
@@ -879,6 +1008,7 @@ class D3ForceChart extends Component {
               targetNode.fy = targetNode.y;
               targetNode._vx = 0;
               targetNode._vy = 0;
+              that.selectedGroup = targetNode.group;
             }
             freeNode = false;
             dataset.links.push({
@@ -1034,8 +1164,10 @@ class D3ForceChart extends Component {
         posY: point[1],
       };//reflexive: false,
       dataset.nodes.push(node);
+      nodesByGroups = d3.nest().key(d => d.group).entries(dataset.nodes);
       nodesById[node.id] = node;
       freeNode = true;
+      that.selectedGroup = node.group;
       restart();
     }
 
@@ -1139,37 +1271,38 @@ class D3ForceChart extends Component {
     restart();
   }
 
-  handleChange(event) {
-    // console.log(event.target.value);
-    this.setState({ value: event.target.value });
-  }
+  // handleChange(event) {
+  //   // console.log(event.target.value);
+  //   this.setState({ value: event.target.value });
+  // }
 
-  groupItemsRender() {
-    let group = this.nodesByGroups.filter(d => d.key === this.state.value);
-    if (group && group[0] && group[0].values) {
-      group = group[0].values
-    }
-    console.log("group", group);
-    return group.map((d, i) => {
-      return (
-        <div className="group-item" value={d.id} key={d.id + "_" + d.name}>
-          <p>{`Name: ${d.name}`}</p>
-          <p>{`Value: ${d.value}`}</p>
-        </div>
-      )
-    })
-  }
+  // groupItemsRender() {
+  //   let group = this.nodesByGroups.filter(d => d.key === this.state.value);
+  //   if (group && group[0] && group[0].values) {
+  //     group = group[0].values
+  //   }
+  //   console.log("group", group);
+  //   return group.map((d, i) => {
+  //     return (
+  //       <div className="group-item" value={d.id} key={d.id + "_" + d.name}>
+  //         <p>{`Name: ${d.name}`}</p>
+  //         <p>{`Value: ${d.value}`}</p>
+  //       </div>
+  //     )
+  //   })
+  // }
   render() {
     return (
       <div className="dash-container">
         <div className="d3-chart-wrapper " id='forceSvg' ref={viz => (this.viz = viz)}>
         </div>
 
-        {/* <div
+        <div
           id="nodesTable"
-          className="nodes-table-container">
-          <h2 className="container-header">Groups</h2>
-          <select value={this.state.value} onChange={this.handleChange}>
+          className="nodes-table-container"
+          ref={chartViz => (this.chartViz = chartViz)}
+        >
+          {/* <select value={this.state.value} onChange={this.handleChange}>
             {
               this.nodesByGroups.map((d, i) => {
                 return (
@@ -1177,10 +1310,10 @@ class D3ForceChart extends Component {
                 )
 
               })
-            } </select>
-          <br />
-          {this.groupItemsRender()}
-        </div> */}
+            } </select> */}
+          {/* <br /> */}
+          {/* {that.groupItemsRender()} */}
+        </div>
 
       </div>
     );
