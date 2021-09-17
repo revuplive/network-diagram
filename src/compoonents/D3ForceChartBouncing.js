@@ -771,12 +771,16 @@ class D3ForceChart extends Component {
     
       node = nodeEnter.merge(node); // enter + update on the g
     
-      // node.attr('transform', function(d){ // enter + update, position the g
-      //   return 'translate(' + d.x + ',' + d.y + ')';
-      // });
+      node.style("background-color",d=>{
+        console.log("NODE D",d,"targetNode",targetNode,"sourceNode",sourceNode);
+        return !!(targetNode && d.id === targetNode.id) || !!(sourceNode && d.id === sourceNode.id)  ? colors(d.group): "transparent"
+      });
     
-      node.select(".group-item") // enter + update on subselection
-        .attr("value", d => d.id)
+      node
+      // .append("div")
+      // .attr("class", "group-item")
+      // .select(".group-item") // enter + update on subselection
+        // .attr("value", d => d.id)
         .html(d => `<p>Name: ${d.name}</p><p>Value: ${d.value}</p>`);
     
       // tabElement.exit();
